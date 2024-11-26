@@ -3,7 +3,7 @@
 ## Como executar
 
 ### Pré-requisitos
-- Ter o `poetry` instalado.[^1]
+- Ter o `Poetry` instalado.[^1]
 - Ter o `Docker` instalado.[^2]
 
 [^1]: https://python-poetry.org/docs/#installation
