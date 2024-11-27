@@ -1,0 +1,30 @@
+{%  extends "base.html" %}
+
+{% block content %}
+    <h1>Regras Existentes</h1>
+    <div class="container mt-5">
+        <h2>Tabela de Regras</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <!-- Assuming the table has 3 columns: 'id', 'name', 'description' -->
+                    <th>ID</th>
+                    <th>Tabela em que se aplica</th>
+                    <th>Regra</th>
+                    <th>Atualizada em</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rule in rulelist %}
+                    <tr>
+                        <!-- Assuming each rule is a tuple with 3 elements (ID, Name, Description) -->
+                        <td>{{ rule[0] }}</td>
+                        <td>{{ rule[1] }}</td>
+                        <td>{{ rule[2] }}</td>
+                        <td>{{ rule[3] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
