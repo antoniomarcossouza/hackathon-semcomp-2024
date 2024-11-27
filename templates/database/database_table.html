@@ -10,6 +10,7 @@
     <h1>Adicionar um novo Database</h1>
     <form method="POST" action="{{ url_for('upload_database') }}" enctype="multipart/form-data">
         <input type="file" name="file" accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv text/plain" required>
+        <input type="text" name="df_name" placeholder="Tabela Bovina">
         <input type="submit" value="Upload File">
     </form>
 {% endblock %}
