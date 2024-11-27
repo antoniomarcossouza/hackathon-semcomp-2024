@@ -1,30 +1,47 @@
-{%  extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
+<div class="container mt-5">
     <h1>Regras Existentes</h1>
-    <div class="container mt-5">
-        <h2>Tabela de Regras</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <!-- Assuming the table has 3 columns: 'id', 'name', 'description' -->
-                    <th>ID</th>
-                    <th>Tabela em que se aplica</th>
-                    <th>Regra</th>
-                    <th>Atualizada em</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for rule in rulelist %}
-                    <tr>
-                        <!-- Assuming each rule is a tuple with 3 elements (ID, Name, Description) -->
-                        <td>{{ rule[0] }}</td>
-                        <td>{{ rule[1] }}</td>
-                        <td>{{ rule[2] }}</td>
-                        <td>{{ rule[3] }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <h2>Tabela de Regras</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tabela em que se aplica</th>
+                <th>Regra</th>
+                <th>Consulta</th>
+                <th>Atualizada em</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rule in rulelist %}
+            <tr>
+                <td>{{ rule[0] }}</td>
+                <td>{{ rule[1] }}</td>
+                <td>{{ rule[2] }}</td>
+                <td>{{ rule[3] }}</td>
+                <td>{{ rule[4] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container mt-5">
+    <h1>Adicionar uma nova regra</h1>
+    <form method="post">
+        <label for="title">Tabela:</label>
+        <br>
+        <input type="text" name="nome_tabela" placeholder="tb_lactacao"
+            value="{{ request.form['nome_tabela'] }}"></input>
+        <br>
+        <label for="content">Regra</label>
+        <br>
+        <textarea name="texto" placeholder="O lançamento não pode ser 40% superior em relação ao lançamento anterior"
+            rows="15" cols="60">{{ request.form['texto'] }}</textarea>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+</div>
 {% endblock %}
