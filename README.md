@@ -2,6 +2,11 @@
 
 ## Como executar
 
+- No diretório raíz ativar o venv com o comando
+  - `source .venv/bin/activate`
+- Ainda no diretório raiz
+  - `gunicorn --bind 0.0.0.0:5000 wsgi:app`
+
 ### Pré-requisitos
 - Ter o `Poetry` instalado.[^1]
 - Ter o `Docker` instalado.[^2]
