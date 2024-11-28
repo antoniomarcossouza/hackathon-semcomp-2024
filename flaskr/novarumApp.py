@@ -3,10 +3,10 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
-from llm import get_query
+# from llm import get_query
 from psycopg2 import sql
 
-load_dotenv(dotenv_path="./conf/.env")
+load_dotenv(dotenv_path="./conf/.env.example")
 
 
 app = Flask(__name__, template_folder="templates")
@@ -31,6 +31,19 @@ def get_db_connection():
 def index():
     return render_template("index.html")
 
+@app.route("/graphs")
+def graphs():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    if conn and cur:
+        cur.execute("SELECT * FROM tb_regras;")
+        rulelist = cur.fetchall()
+    else:
+        rulelist = ["Conexão com o banco falhou!"]
+
+    cur.close()
+    conn.close()
+    return render_template("rules/graphs_page.html", rulelist=rulelist)
 
 @app.route("/regras", methods=["GET", "POST"])
 def rules():
@@ -72,12 +85,13 @@ def rules():
                 return render_template(
                     "rules/rules_table.html",
                     rulelist=rulelist,
-                    queryllm=get_query(
-                        state={
-                            "table": table_name,
-                            "rule": rule,
-                        },
-                    ),
+                    queryllm="generica"
+                    # queryllm=get_query(
+                    #     state={
+                    #         "table": table_name,
+                    #         "rule": rule,
+                    #     },
+                    #),
                 )
 
         cur.close()
