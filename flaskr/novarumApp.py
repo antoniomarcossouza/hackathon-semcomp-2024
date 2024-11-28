@@ -1,29 +1,29 @@
 import os
+
 import psycopg2
-from psycopg2 import sql
 from dotenv import load_dotenv
-from flask import (
-    Flask,
-    render_template,
-    request,
-)
+from flask import Flask, render_template, request
+from llm import get_query
+from psycopg2 import sql
+import sqlfluff
+
+load_dotenv(dotenv_path="./conf/.env.example")
+
 
 app = Flask(__name__, template_folder="templates")
-
-load_dotenv("./conf/.env.example")
-database = os.getenv("POSTGRES_DB")
-user = os.getenv("POSTGRES_USER")
-password = os.getenv("POSTGRES_PASSWORD")
 app.secret_key = os.getenv("APP_SECRET_KEY")
 
-print(database, user, password, app.secret_key)
+POSTGRES_DB = os.getenv("POSTGRES_DB")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+
 
 def get_db_connection():
     conn = psycopg2.connect(
         host="localhost",
-        database=database,
-        user=user,
-        password=password,
+        database=POSTGRES_DB,
+        user=POSTGRES_USER,
+        password=POSTGRES_PASSWORD,
     )
     return conn
 
@@ -31,6 +31,21 @@ def get_db_connection():
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/graphs")
+def graphs():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    if conn and cur:
+        cur.execute("SELECT * FROM tb_regras;")
+        rulelist = cur.fetchall()
+    else:
+        rulelist = ["Conexão com o banco falhou!"]
+
+    cur.close()
+    conn.close()
+    return render_template("rules/graphs_page.html", rulelist=rulelist)
 
 
 @app.route("/regras", methods=["GET", "POST"])
@@ -45,26 +60,52 @@ def rules():
     if request.method == "GET":
         cur.close()
         conn.close()
-        return render_template("rules/rules_table.html", rulelist=rulelist, queryllm='Sua query será gerada aqui')
-    elif request.method == 'POST':
-        if 'texto' in request.form.keys() and 'nome_tabela' in request.form.keys():
-            table_name = request.form.get('nome_tabela')
-            rule = request.form.get('texto')
-            action = request.form.get('action')
-            if action=='saverule':
-                insert_query = sql.SQL("INSERT INTO tb_regras (nome_tabela, texto) VALUES (%s, %s)")
-                cur.execute(insert_query, (table_name, rule))
+        return render_template(
+            "rules/rules_table.html",
+            rulelist=rulelist,
+            queryllm="Sua query será gerada aqui",
+        )
+    if request.method == "POST":
+        global query
+        if (
+            "texto" in request.form.keys()
+            and "nome_tabela" in request.form.keys()
+        ):
+            table_name = request.form.get("nome_tabela")
+            rule = request.form.get("texto")
+            action = request.form.get("action")
+            if action == "saverule":
+                insert_query = sql.SQL(
+                    "INSERT INTO tb_regras (nome_tabela, texto, query) VALUES (%s, %s, %s)",
+                )
+                cur.execute(insert_query, (table_name, rule, query))
                 conn.commit()
-                return f"{table_name} e {rule} inseridos na tabela com sucesso!", 200
+                return (
+                    f"{table_name} e {rule} inseridos na tabela com sucesso!",
+                    200,
+                )
+            elif action == "submitquery":
+                query = get_query(
+                    state={
+                        "table": table_name,
+                        "rule": rule,
+                    }
+                )
 
-            elif action=='submitquery':
-                # TODO LLM
-                queryllm = rule
-                return render_template("rules/rules_table.html", rulelist=rulelist, queryllm=queryllm)
+                return render_template(
+                    "rules/rules_table.html",
+                    rulelist=rulelist,
+                    queryllm=sqlfluff.fix(query, dialect="postgres"),
+                )
 
         cur.close()
         conn.close()
-        return render_template("rules/rules_table.html", rulelist=rulelist, queryllm='')
+        return render_template(
+            "rules/rules_table.html",
+            rulelist=rulelist,
+            queryllm="",
+        )
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
