@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex-grow mt-12  mb-4 container">
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <caption class="caption-top p-1 ml-3 mt-2 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                Regras Existentes
+                <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Veja nessa tabela as regras criadas e as tabelas associadas.</p>
+            </caption>
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        ID
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Tabela em que se aplica
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Regra
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Consulta
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Atualizada em
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rule in rulelist %}
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <th scope="row" class="px-6 py-4">{{ rule[0] }}</th>
+                    <td class="px-6 py-4">{{ rule[1] }}</td>
+                    <td class="px-6 py-4">{{ rule[2] }}</td>
+                    <td class="px-6 py-4">{{ rule[3] }}</td>
+                    <td class="px-6 py-4">{{ rule[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="container max-w-4xl mx-auto mt-10 px-4 py-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Adicionar uma nova regra</h1>
+
+        <form method="post" class="space-y-6">
+            <!-- Table Name Input -->
+            <div>
+                <label for="nome_tabela" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tabela:</label>
+                <input
+                    required
+                    type="text"
+                    name="nome_tabela"
+                    id="nome_tabela"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    placeholder="tb_lactacao"
+                    value="{{ request.form['nome_tabela'] }}">
+            </div>
+
+            <!-- Rule Textarea -->
+            <div>
+                <label for="texto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Regra:</label>
+                <textarea
+                    required
+                    name="texto"
+                    id="texto"
+                    placeholder="O lançamento não pode ser 40% superior em relação ao lançamento anterior"
+                    rows="6"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{{ request.form['texto'] }}</textarea>
+            </div>
+
+            <div name="query_llm"
+                 class="mt-3 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                {{ queryllm }}
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-4">
+                <button
+                    type="submit"
+                    name="action"
+                    value="saverule"
+                    class="w-auto px-6 py-2 bg-blue-800 text-white font-semibold rounded-md shadow-sm hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                    Submit
+                </button>
+                <button
+                    type="submit"
+                    name="action"
+                    value="submitquery"
+                    class="w-auto px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+                    Gerar Query
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+{% endblock %}
