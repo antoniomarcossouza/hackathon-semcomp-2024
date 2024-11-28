@@ -1,29 +1,28 @@
 import os
+
 import psycopg2
-from psycopg2 import sql
 from dotenv import load_dotenv
-from flask import (
-    Flask,
-    render_template,
-    request,
-)
+from flask import Flask, render_template, request
+from llm import get_query
+from psycopg2 import sql
+
+load_dotenv(dotenv_path="./conf/.env")
+
 
 app = Flask(__name__, template_folder="templates")
-
-load_dotenv("./conf/.env.example")
-database = os.getenv("POSTGRES_DB")
-user = os.getenv("POSTGRES_USER")
-password = os.getenv("POSTGRES_PASSWORD")
 app.secret_key = os.getenv("APP_SECRET_KEY")
 
-print(database, user, password, app.secret_key)
+POSTGRES_DB = os.getenv("POSTGRES_DB")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+
 
 def get_db_connection():
     conn = psycopg2.connect(
         host="localhost",
-        database=database,
-        user=user,
-        password=password,
+        database=POSTGRES_DB,
+        user=POSTGRES_USER,
+        password=POSTGRES_PASSWORD,
     )
     return conn
 
@@ -45,26 +44,50 @@ def rules():
     if request.method == "GET":
         cur.close()
         conn.close()
-        return render_template("rules/rules_table.html", rulelist=rulelist, queryllm='Sua query será gerada aqui')
-    elif request.method == 'POST':
-        if 'texto' in request.form.keys() and 'nome_tabela' in request.form.keys():
-            table_name = request.form.get('nome_tabela')
-            rule = request.form.get('texto')
-            action = request.form.get('action')
-            if action=='saverule':
-                insert_query = sql.SQL("INSERT INTO tb_regras (nome_tabela, texto) VALUES (%s, %s)")
+        return render_template(
+            "rules/rules_table.html",
+            rulelist=rulelist,
+            queryllm="Sua query será gerada aqui",
+        )
+    if request.method == "POST":
+        if (
+            "texto" in request.form.keys()
+            and "nome_tabela" in request.form.keys()
+        ):
+            table_name = request.form.get("nome_tabela")
+            rule = request.form.get("texto")
+            action = request.form.get("action")
+            if action == "saverule":
+                insert_query = sql.SQL(
+                    "INSERT INTO tb_regras (nome_tabela, texto) VALUES (%s, %s)",
+                )
                 cur.execute(insert_query, (table_name, rule))
                 conn.commit()
-                return f"{table_name} e {rule} inseridos na tabela com sucesso!", 200
+                return (
+                    f"{table_name} e {rule} inseridos na tabela com sucesso!",
+                    200,
+                )
 
-            elif action=='submitquery':
-                # TODO LLM
-                queryllm = rule
-                return render_template("rules/rules_table.html", rulelist=rulelist, queryllm=queryllm)
+            if action == "submitquery":
+                return render_template(
+                    "rules/rules_table.html",
+                    rulelist=rulelist,
+                    queryllm=get_query(
+                        state={
+                            "table": table_name,
+                            "rule": rule,
+                        },
+                    ),
+                )
 
         cur.close()
         conn.close()
-        return render_template("rules/rules_table.html", rulelist=rulelist, queryllm='')
+        return render_template(
+            "rules/rules_table.html",
+            rulelist=rulelist,
+            queryllm="",
+        )
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
