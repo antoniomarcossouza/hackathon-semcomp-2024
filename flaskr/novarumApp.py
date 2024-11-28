@@ -1,13 +1,13 @@
 import os
 
 import psycopg2
+import sqlfluff
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from llm import get_query
 from psycopg2 import sql
-import sqlfluff
 
-load_dotenv(dotenv_path="./conf/.env.example")
+load_dotenv(dotenv_path="./conf/.env")
 
 
 app = Flask(__name__, template_folder="templates")
@@ -84,12 +84,12 @@ def rules():
                     f"{table_name} e {rule} inseridos na tabela com sucesso!",
                     200,
                 )
-            elif action == "submitquery":
+            if action == "submitquery":
                 query = get_query(
                     state={
                         "table": table_name,
                         "rule": rule,
-                    }
+                    },
                 )
 
                 return render_template(
