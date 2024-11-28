@@ -8,7 +8,7 @@ CREATE TABLE tb_regras (
 INSERT INTO tb_regras (nome_tabela, texto, query)
 VALUES 
 ('tb_lactacao',
-'O lançamento não pode ser 50% superior em relação à curva de uma raça em específico.',
+'O lançamento não pode ser 60% superior em relação à curva de uma raça em específico.',
 'WITH cte_media_acumulada AS (
     SELECT
         atual.ano_semana,
