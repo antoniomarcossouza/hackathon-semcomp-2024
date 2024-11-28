@@ -3,7 +3,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
-# from llm import get_query
+from llm import get_query
 from psycopg2 import sql
 
 load_dotenv(dotenv_path="./conf/.env.example")
@@ -85,13 +85,12 @@ def rules():
                 return render_template(
                     "rules/rules_table.html",
                     rulelist=rulelist,
-                    queryllm="generica"
-                    # queryllm=get_query(
-                    #     state={
-                    #         "table": table_name,
-                    #         "rule": rule,
-                    #     },
-                    #),
+                    queryllm=get_query(
+                        state={
+                            "table": table_name,
+                            "rule": rule,
+                        },
+                    ),
                 )
 
         cur.close()
