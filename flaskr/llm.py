@@ -26,7 +26,8 @@ Se atente ao nome das colunas para não escrevê-las incorretamente.
 Referencie apenas as colunas no esquema da tabela fornecido.
 Não particione tabelas a não ser que sejam realmente grandes.
 Não retorne caracteres como \n, \t, etc.
-Nunca selecione *, sempre especifique as colunas que deseja.
+NUNCA selecione *, sempre especifique as colunas que deseja.
+SEMPRE inclua a CHAVE PRIMÁRIA na seleção.
 NÃO FAÇA nenhuma declaração DML (INSERT, UPDATE, DELETE, DROP etc.) no banco.
 
 Gere uma consulta que descubra quais linhas violam a regra: `{rule}`
