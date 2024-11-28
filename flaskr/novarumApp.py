@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from llm import get_query
 from psycopg2 import sql
+import sqlfluff
 
 load_dotenv(dotenv_path="./conf/.env.example")
 
@@ -31,6 +32,7 @@ def get_db_connection():
 def index():
     return render_template("index.html")
 
+
 @app.route("/graphs")
 def graphs():
     conn = get_db_connection()
@@ -44,6 +46,7 @@ def graphs():
     cur.close()
     conn.close()
     return render_template("rules/graphs_page.html", rulelist=rulelist)
+
 
 @app.route("/regras", methods=["GET", "POST"])
 def rules():
@@ -63,6 +66,7 @@ def rules():
             queryllm="Sua query será gerada aqui",
         )
     if request.method == "POST":
+        global query
         if (
             "texto" in request.form.keys()
             and "nome_tabela" in request.form.keys()
@@ -72,25 +76,26 @@ def rules():
             action = request.form.get("action")
             if action == "saverule":
                 insert_query = sql.SQL(
-                    "INSERT INTO tb_regras (nome_tabela, texto) VALUES (%s, %s)",
+                    "INSERT INTO tb_regras (nome_tabela, texto, query) VALUES (%s, %s, %s)",
                 )
-                cur.execute(insert_query, (table_name, rule))
+                cur.execute(insert_query, (table_name, rule, query))
                 conn.commit()
                 return (
                     f"{table_name} e {rule} inseridos na tabela com sucesso!",
                     200,
                 )
+            elif action == "submitquery":
+                query = get_query(
+                    state={
+                        "table": table_name,
+                        "rule": rule,
+                    }
+                )
 
-            if action == "submitquery":
                 return render_template(
                     "rules/rules_table.html",
                     rulelist=rulelist,
-                    queryllm=get_query(
-                        state={
-                            "table": table_name,
-                            "rule": rule,
-                        },
-                    ),
+                    queryllm=sqlfluff.fix(query, dialect="postgres"),
                 )
 
         cur.close()
