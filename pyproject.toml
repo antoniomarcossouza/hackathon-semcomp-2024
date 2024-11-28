@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "hackathon-semcomp-2024"
 version = "0.1.0"
-description = ""
-authors = ["Antônio Marcos <antoniomarcos.souza2002@gmail.com>"]
+authors = ["Antônio Marcos", "Alexandre Braga"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
