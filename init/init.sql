@@ -6,15 +6,14 @@ CREATE TABLE tb_regras (
     last_updated date DEFAULT CURRENT_TIMESTAMP
 );
 INSERT INTO tb_regras (nome_tabela, texto)
-VALUES (
-        'tb_lactacao',
-        'O lançamento não pode ser 40% superior em relação ao lançamento anterior'
-    );
-INSERT INTO tb_regras (nome_tabela, texto)
-VALUES (
-        'tb_lactacao',
-        'O lançamento não pode ser 40% superior em relação ao lançamento anterior'
-    );
+VALUES 
+('tb_lactacao',
+'O lançamento não pode ser 40% superior em relação ao lançamento anterior'
+),
+(
+'tb_lactacao',
+'O lançamento não pode ser 40% superior em relação ao lançamento anterior'
+);
 
 CREATE TABLE tb_lactacao (
     ano INT,
