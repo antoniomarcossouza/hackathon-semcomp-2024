@@ -5,18 +5,133 @@ CREATE TABLE tb_regras (
     query TEXT NULL,
     last_updated date DEFAULT CURRENT_TIMESTAMP
 );
-INSERT INTO tb_regras (nome_tabela, texto)
+INSERT INTO tb_regras (nome_tabela, texto, query)
 VALUES 
 ('tb_lactacao',
-'O lançamento não pode ser 50% superior em relação à curva de uma raça em específico.'
+'O lançamento não pode ser 50% superior em relação à curva de uma raça em específico.',
+'WITH cte_media_acumulada AS (
+    SELECT
+        atual.ano_semana,
+        atual.data_inicio,
+        atual.data_fim,
+        atual.raca_holandesa_kg,
+        atual.raca_jersey_kg,
+        atual.raca_gir_kg,
+        (
+            SELECT AVG(anterior.raca_holandesa_kg)
+            FROM tb_lactacao anterior
+            WHERE anterior.data_fim < atual.data_inicio
+        ) AS media_holandesa,
+        (
+            SELECT AVG(anterior.raca_jersey_kg)
+            FROM tb_lactacao anterior
+            WHERE anterior.data_fim < atual.data_inicio
+        ) AS media_jersey,
+        (
+            SELECT AVG(anterior.raca_gir_kg)
+            FROM tb_lactacao anterior
+            WHERE anterior.data_fim < atual.data_inicio
+        ) AS media_gir
+    FROM
+        tb_lactacao atual
+)
+SELECT
+    ano_semana,
+    data_inicio,
+    data_fim,
+    raca_holandesa_kg,
+    media_holandesa,
+    raca_jersey_kg,
+    media_jersey,
+    raca_gir_kg,
+    media_gir
+from cte_media_acumulada
+WHERE
+    (raca_holandesa_kg > 1.5 * media_jersey OR raca_holandesa_kg > 1.5 * media_gir OR
+     raca_jersey_kg > 1.5 * media_holandesa OR raca_jersey_kg > 1.5 * media_gir OR
+     raca_gir_kg > 1.5 * media_holandesa OR raca_gir_kg > 1.5 * media_jersey);'
 ),
 (
 'tb_lactacao',
-'O lançamento não pode ser 20% superiores em relação à media dos lançamentos anteriores.'
+'O lançamento não pode ser 30% superiores em relação à media dos lançamentos anteriores.',
+'WITH cte_media_acumulada AS (
+    SELECT
+        atual.ano_semana,
+        atual.data_inicio,
+        atual.data_fim,
+        atual.raca_holandesa_kg,
+        atual.raca_jersey_kg,
+        atual.raca_gir_kg,
+        (
+            SELECT AVG(anterior.raca_holandesa_kg)
+            FROM tb_lactacao anterior
+            WHERE anterior.data_fim < atual.data_inicio
+        ) AS media_holandesa,
+        (
+            SELECT AVG(anterior.raca_jersey_kg)
+            FROM tb_lactacao anterior
+            WHERE anterior.data_fim < atual.data_inicio
+        ) AS media_jersey,
+        (
+            SELECT AVG(anterior.raca_gir_kg)
+            FROM tb_lactacao anterior
+            WHERE anterior.data_fim < atual.data_inicio
+        ) AS media_gir
+    FROM
+        tb_lactacao atual
+)
+SELECT
+    ano_semana,
+    data_inicio,
+    data_fim,
+    raca_holandesa_kg,
+    media_holandesa,
+    raca_jersey_kg,
+    media_jersey,
+    raca_gir_kg,
+    media_gir
+FROM
+    cte_media_acumulada
+WHERE
+    (raca_holandesa_kg > 1.3 * media_holandesa AND media_holandesa IS NOT NULL) OR
+    (raca_jersey_kg > 1.3 * media_jersey AND media_jersey IS NOT NULL) OR
+    (raca_gir_kg > 1.3 * media_gir AND media_gir IS NOT NULL);'
 ),
 (
 'tb_lactacao',
-'O lançamento não pode ser 40% superior ao lançamento anterior.'
+'O lançamento não pode ser 40% superior ao lançamento anterior.',
+'WITH cte_comparacao AS (
+    SELECT
+        atual.ano_semana AS semana_atual,
+        anterior.ano_semana AS semana_anterior,
+        atual.raca_holandesa_kg,
+        anterior.raca_holandesa_kg AS raca_holandesa_kg_anterior,
+        atual.raca_jersey_kg,
+        anterior.raca_jersey_kg AS raca_jersey_kg_anterior,
+        atual.raca_gir_kg,
+        anterior.raca_gir_kg AS raca_gir_kg_anterior
+    FROM
+        tb_lactacao atual
+    LEFT JOIN
+        tb_lactacao anterior
+    ON
+        atual.data_inicio = anterior.data_fim + INTERVAL ''1 day''
+)
+SELECT
+    semana_atual,
+    semana_anterior,
+    raca_holandesa_kg,
+    raca_holandesa_kg_anterior,
+    raca_jersey_kg,
+    raca_jersey_kg_anterior,
+    raca_gir_kg,
+    raca_gir_kg_anterior
+FROM
+    cte_comparacao
+WHERE
+    raca_holandesa_kg > 1.4 * raca_holandesa_kg_anterior OR
+    raca_jersey_kg > 1.4 * raca_jersey_kg_anterior OR
+    raca_gir_kg > 1.4 * raca_gir_kg_anterior;'
 );
 
 CREATE TABLE tb_lactacao (
