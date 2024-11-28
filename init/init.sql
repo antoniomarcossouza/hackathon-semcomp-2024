@@ -196,3 +196,9 @@ VALUES
 ('2023_42', '2023-10-15', '2023-10-21', 15.10, 12.08, 0.00),
 ('2023_43', '2023-10-22', '2023-10-28', 14.00, 11.20, 0.00),
 ('2023_44', '2023-10-29', '2023-11-04', 12.90, 10.32, 0.00);
+
+CREATE TABLE tb_violacoes (
+    id_item VARCHAR NOT NULL,
+    nome_tabela VARCHAR NOT NULL,
+    id_regra_violada VARCHAR NOT NULL
+);
