@@ -25,8 +25,10 @@ A não ser que explicitamente dito, compare cada coluna com as linhas anteriores
 Se atente ao nome das colunas para não escrevê-las incorretamente.
 Referencie apenas as colunas no esquema da tabela fornecido.
 Não particione tabelas a não ser que sejam realmente grandes.
+SE tiver ASPAS SIMPLES (') na consulta, escreva ela duplicada (''), pois ela será salva em uma tabela.
 Não retorne caracteres como \n, \t, etc.
 NUNCA selecione *, sempre especifique as colunas que deseja.
+NÃO COLOQUE comentários na consulta.
 SEMPRE inclua a CHAVE PRIMÁRIA na seleção.
 NÃO FAÇA nenhuma declaração DML (INSERT, UPDATE, DELETE, DROP etc.) no banco.
 
