@@ -52,10 +52,14 @@ def violations():
     conn = get_db_connection()
     cur = conn.cursor()
     if conn and cur:
-        cur.execute("SELECT id_item, array_agg(id_regra_violada) FROM tb_violacoes GROUP BY id_item ORDER BY id_item ASC;")
+        cur.execute("SELECT * FROM tb_violacoes;")
         violationlist = cur.fetchall()
-        item = [item[0] for item in violationlist]
-        regraviolada = [regra[1] for regra in violationlist]
+
+        cur.execute("SELECT id_item, array_agg(id_regra_violada) FROM tb_violacoes GROUP BY id_item ORDER BY id_item ASC;")
+        violationlist_filtered = cur.fetchall()
+
+        item = [item[0] for item in violationlist_filtered]
+        regraviolada = [regra[1] for regra in violationlist_filtered]
 
         cur.execute("SELECT DISTINCT nome_tabela FROM tb_violacoes;")
         nomestabelas = cur.fetchall()
@@ -64,7 +68,7 @@ def violations():
 
     cur.close()
     conn.close()
-    return render_template("rules/violations_page.html", violationlist=violationlist, nomestabelas=nomestabelas, item=item, regraviolada=regraviolada)
+    return render_template("rules/violations_page.html", violationlist=violationlist_filtered, nomestabelas=nomestabelas, item=item, regraviolada=regraviolada, violationlist_full=violationlist)
 
 def get_rules(conn, cursor):
     if conn and cursor:

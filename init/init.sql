@@ -47,9 +47,9 @@ SELECT
     media_gir
 from cte_media_acumulada
 WHERE
-    (raca_holandesa_kg > 1.5 * media_jersey OR raca_holandesa_kg > 1.5 * media_gir OR
-     raca_jersey_kg > 1.5 * media_holandesa OR raca_jersey_kg > 1.5 * media_gir OR
-     raca_gir_kg > 1.5 * media_holandesa OR raca_gir_kg > 1.5 * media_jersey);'
+    (raca_holandesa_kg > 1.6 * media_jersey OR raca_holandesa_kg > 1.6 * media_gir OR
+     raca_jersey_kg > 1.6 * media_holandesa OR raca_jersey_kg > 1.6 * media_gir OR
+     raca_gir_kg > 1.6 * media_holandesa OR raca_gir_kg > 1.6 * media_jersey);'
 ),
 (
 'tb_lactacao',

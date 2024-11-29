@@ -4,6 +4,37 @@
 <div class="flex-grow mt-12 mb-4 container">
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-8">
+
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <caption class="caption-top p-1 ml-3 mt-2 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                Regras Violadas por Tb_Lactacao
+                <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Veja aqui as regras que violadas na tabela tb_lactacao.</p>
+            </caption>
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        ID
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Tabela em que se aplica
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Regra Violada
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for violation in violationlist_full %}
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <th scope="row" class="px-6 py-4">{{ violation[0] }}</th>
+                    <td class="px-6 py-4">{{ violation[1] }}</td>
+                    <td class="px-6 py-4">{{ violation[2] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Plotagem Gráfica</h1>
         <div class="flex justify-between mb-6">
             <div class="w-full">
