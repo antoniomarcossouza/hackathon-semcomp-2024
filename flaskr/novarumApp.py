@@ -90,6 +90,16 @@ def rules():
                     queryllm="Sua query será gerada aqui",
                 )
             if action == "submitquery":
+                cur.execute(sql.SQL("SELECT to_regclass(%s);"), [table_name])
+                table_exists = cur.fetchone()[0] is not None
+
+                if not table_exists:
+                    return render_template(
+                        "rules/rules_table.html",
+                        rulelist=rulelist,
+                        queryllm=f"A tabela '{table_name}' não existe no banco de dados.",
+                    )
+
                 query = get_query(
                     state={
                         "table": table_name,
