@@ -47,6 +47,24 @@ def graphs():
     conn.close()
     return render_template("rules/graphs_page.html", rulelist=rulelist)
 
+@app.route("/violations")
+def violations():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    if conn and cur:
+        cur.execute("SELECT id_item, array_agg(id_regra_violada) FROM tb_violacoes GROUP BY id_item ORDER BY id_item ASC;")
+        violationlist = cur.fetchall()
+        item = [item[0] for item in violationlist]
+        regraviolada = [regra[1] for regra in violationlist]
+
+        cur.execute("SELECT DISTINCT nome_tabela FROM tb_violacoes;")
+        nomestabelas = cur.fetchall()
+    else:
+        violationlist = ["Conexão com o banco falhou!"]
+
+    cur.close()
+    conn.close()
+    return render_template("rules/violations_page.html", violationlist=violationlist, nomestabelas=nomestabelas, item=item, regraviolada=regraviolada)
 
 @app.route("/regras", methods=["GET", "POST"])
 def rules():
